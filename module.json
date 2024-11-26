@@ -130,7 +130,19 @@
                 "PLAYER": "OBSERVER",
                 "ASSISTANT": "OWNER"
                 },
-            "system": "cyberpunk-red-core"
+            "system": "cyberpunk-red-core",
+            "flags": {}
+        },
+        {
+            "name": "night-city-support-macros",
+            "label": "Night City Macros",
+            "path": "packs/night-city-support-macros",
+            "type": "Macro",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },,
+            "flags": {}
         }
     ]
 }
