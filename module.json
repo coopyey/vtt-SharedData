@@ -1,0 +1,136 @@
+{
+    "name": "vtt-SharedData",
+    "title": "Shared Data",
+    "description": "Sharing data across worlds",
+    "author": "coopyey",
+    "version": "1.0.0",
+    "compatibility": {
+        "minimum": "11.315"
+    },
+    "packFolders": [
+        {
+            "name": "Night City Weather",
+            "sorting": "m",
+            "packs": [
+                "night-city-weather-tables",
+                "night-city-weather-macros",
+                "night-city-weather-journal"
+            ]
+        },
+        {
+            "name": "Netrunning Items",
+            "sorting": "m",
+            "packs": [
+                "netrunning-black-ice",
+                "netrunning-demons",
+                "netrunning-other"
+            ]
+        }
+    ],
+    "packs": [
+        {
+            "name": "cyberpunk-red-corrected-dvs",
+            "label": "Cyberpunk RED: Corrected DVs",
+            "path": "packs/cyberpunk-red-corrected-dvs",
+            "type": "RollTable",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "system": "cyberpunk-red-core",
+            "flags": {}
+        },
+        {
+            "name": "night-city-alcohol",
+            "label": "Night City Alcohol",
+            "path": "packs/night-city-alcohol",
+            "type": "Item",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "system": "cyberpunk-red-core",
+            "flags": {}
+        },
+        {
+            "name": "netrunning-black-ice",
+            "label": "Netrunning: Black Ice",
+            "path": "packs/netrunning-black-ice",
+            "type": "Actor",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "system": "cyberpunk-red-core",
+            "flags": {}
+        },
+        {
+            "name": "netrunning-demons",
+            "label": "Netrunning: Demons",
+            "path": "packs/netrunning-demons",
+            "type": "Actor",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "system": "cyberpunk-red-core",
+            "flags": {}
+        },
+        {
+            "name": "netrunning-other",
+            "label": "Netrunning: Other",
+            "path": "packs/netrunning-other",
+            "type": "Actor",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "system": "cyberpunk-red-core",
+            "flags": {}
+        },
+        {
+            "name": "night-city-weather-tables",
+            "label": "Night City Weather Tables",
+            "path": "packs/night-city-weather-tables",
+            "type": "RollTable",
+            "system": "cyberpunk-red-core",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "relationships": {
+                "requires": [
+                    {
+                        "id": "foundryvtt-simple-calendar",
+                        "type": "module",
+                        "compatibility": {} 
+                    }
+                ]
+            },
+            "flags": {}
+        },
+        {
+            "name": "night-city-weather-macros",
+            "label": "Night City Weather Macros",
+            "path": "packs/night-city-weather-macros",
+            "type": "Macro",
+            "system": "cyberpunk-red-core",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "flags": {}
+        },
+        {
+            "name": "night-city-weather-journal",
+            "label": "Night City Weather Journal",
+            "path": "packs/night-city-weather-journal",
+            "type": "JournalEntry",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+                },
+            "system": "cyberpunk-red-core"
+        }
+    ]
+}

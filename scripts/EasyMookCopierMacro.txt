@@ -1,0 +1,926 @@
+// Function to check if a character sheet is active
+function getActiveActorSheet() {
+    const appWindows = Object.values(ui.windows);
+    for (const window of appWindows) {
+        if (window instanceof ActorSheet) {
+            return window.actor; // Returns the associated Actor of the active sheet
+        }
+    }
+    return null; // No character sheet active
+}
+
+// Determine whether a character sheet or token is active
+let actor = getActiveActorSheet();
+if (!actor) {
+    if (canvas.tokens.controlled.length > 0) {
+        actor = canvas.tokens.controlled[0]?.actor;
+    } else {
+        ui.notifications.warn("No character sheet is open, and no token is selected. Please open a character sheet or select a token.");
+        return;
+    }
+}
+
+// Skill-stat mapping
+const skillStats = {
+    "conceal/reveal object": "INT",
+    "concentration": "WILL",
+    "lip reading": "INT",
+    "perception": "INT",
+    "tracking": "INT",
+    "athletics": "DEX",
+    "contortionist": "DEX",
+    "dance": "DEX",
+    "endurance": "WILL",
+    "resist torture/drugs": "WILL",
+    "stealth": "DEX",
+    "drive land vehicle": "REF",
+    "pilot air vehicle": "REF",
+    "pilot sea vehicle": "REF",
+    "riding": "REF",
+    "accounting": "INT",
+    "animal handling": "INT",
+    "bureaucracy": "INT",
+    "business": "INT",
+    "composition": "INT",
+    "criminology": "INT",
+    "cryptography": "INT",
+    "deduction": "INT",
+    "education": "INT",
+    "gamble": "INT",
+    "language (streetslang)": "INT",
+    "library search": "INT",
+    "local expert": "INT",
+    "science": "INT",
+    "tactics": "INT",
+    "wilderness survival": "INT",
+    "brawling": "DEX",
+    "evasion": "DEX",
+    "martial arts": "DEX",
+    "melee weapon": "DEX",
+    "acting": "COOL",
+    "play instrument": "TECH",
+    "archery": "REF",
+    "autofire": "REF",
+    "handgun": "REF",
+    "heavy weapons": "REF",
+    "shoulder arms": "REF",
+    "bribery": "COOL",
+    "conversation": "EMP",
+    "human perception": "EMP",
+    "interrogation": "COOL",
+    "personal grooming": "COOL",
+    "persuasion": "COOL",
+    "streetwise": "COOL",
+    "trading": "COOL",
+    "wardrobe & style": "COOL",
+    "air vehicle tech": "TECH",
+    "basic tech": "TECH",
+    "cybertech": "TECH",
+    "demolitions": "TECH",
+    "electronics/security tech": "TECH",
+    "first aid": "TECH",
+    "forgery": "TECH",
+    "land vehicle tech": "TECH",
+    "paint/draw/sculpt": "TECH",
+    "paramedic": "TECH",
+    "photography/film": "TECH",
+    "pick lock": "TECH",
+    "pick pocket": "TECH",
+    "sea vehicle tech": "TECH",
+    "weaponstech": "TECH"
+};
+
+// Helper function to parse gear items with quantities
+function parseGearItems(gearData) {
+  const gearItems = gearData
+      .split(/,|•|w\//) // Split input into individual items based on commas, bullets, or "w/"
+      .map(item => item.trim())
+      .filter(item => item.length > 0);
+
+  const parsedItems = [];
+
+  gearItems.forEach(item => {
+      // Handle "x<number>" for quantity
+      const quantityMatch = item.match(/x(\d+)$/);
+      const quantity = quantityMatch ? parseInt(quantityMatch[1]) : 1;
+      let name = quantityMatch ? item.replace(/x\d+$/, "").trim() : item;
+
+      // Special case: Do not split "(Head)" or "(Body)"
+      const exceptionMatch = name.match(/(.*?)( \(Head\)| \(Body\))$/);
+      if (exceptionMatch) {
+          // Keep the full name, including "(Head)" or "(Body)"
+          parsedItems.push({ name: name.trim(), quantity });
+      } else {
+          // Split by parentheses if not an exception
+          const parts = name.split(/\(|\)/).map(part => part.trim()).filter(part => part.length > 0);
+          parts.forEach(part => {
+              parsedItems.push({ name: part, quantity });
+          });
+      }
+  });
+
+  return parsedItems;
+}
+
+
+// Dialog for input
+new Dialog({
+    title: "Easy Mook Copier",
+    content: `
+</div>
+<p>1. Select a Token or open a Charakter Sheet <br>
+2. Paste the data in the corresponding fields</p>
+<form>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+        <label><strong>Name:</strong></label>
+        <button type="button" id="pasteNameButton" 
+                style="width: 10%; background: none; border: 1px solid #ddd; cursor: pointer; text-align: center;">
+            <i class="fas fa-paste"></i>
+        </button>
+    </div>
+    <!-- Text field for the name -->
+    <div style="margin-bottom: 10px;">
+        <input id="name-input" type="text" style="width: 100%; box-sizing: border-box;" />
+    </div>
+
+    <!-- New fields for HP, REP, and Role -->
+    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <div style="flex: 1;">
+            <label><strong>HP:</strong></label>
+            <input id="hp-input" type="number" style="width: 100%; box-sizing: border-box;" />
+        </div>
+        <div style="flex: 1;">
+            <label><strong>REP:</strong></label>
+            <input id="rep-input" type="number" style="width: 100%; box-sizing: border-box;" />
+        </div>
+        <div style="flex: 1;">
+            <label><strong>Role:</strong></label>
+            <input id="role-input" type="text" style="width: 100%; box-sizing: border-box;" />
+        </div>
+    </div>
+    
+
+    <div style="text-align: left; margin-bottom: 10px;">
+    <button type="button" id="mook-calculator-button" style="
+        background: #ff4444; 
+        color: white; 
+        border: none; 
+        padding: 5px 10px; 
+        cursor: pointer; 
+        border-radius: 5px; 
+        font-weight: bold;">
+        <strong>Combat #</strong>
+    </button>
+            <div style="margin-bottom: 10px; display: flex; align-items: center;">
+                <label style="flex-grow: 1;"><strong>STATS (INT, REF, DEX, TECH, etc.):</strong></label>
+                <button type="button" id="paste-stats" title="Paste Stats" style="
+                    margin-left: 10px; 
+                    width: 10%; 
+                    background: none; 
+                    border: 1px solid #ddd; 
+                    cursor: pointer; 
+                    text-align: center;">
+                    <i class="fas fa-paste"></i>
+                </button>
+            </div>
+            <textarea id="statistics-input" style="width: 100%; height: 100px;"></textarea>
+            <div style="margin-bottom: 10px; display: flex; align-items: center;">
+                <label style="flex-grow: 1;"><strong>Skills (Athletics, Basic Tech, etc.):</strong></label>
+                <div style="display: flex; gap: 10px; width: 20%;">
+                    <button type="button" id="add-dot-skills" title="Add Dot to Skills" style="
+                        background: none; 
+                        border: 1px solid #ddd; 
+                        cursor: pointer; 
+                        text-align: center; 
+                        font-weight: bold; 
+                        flex: 1;">
+                        •
+                    </button>
+                    <button type="button" id="paste-skills" title="Paste Skills" style="
+                        background: none; 
+                        border: 1px solid #ddd; 
+                        cursor: pointer; 
+                        text-align: center; 
+                        flex: 1;">
+                        <i class="fas fa-paste"></i>
+                    </button>
+                </div>
+            </div>
+            <textarea id="skills-input" style="width: 100%; height: 100px;"></textarea>
+            <div style="margin-bottom: 10px; display: flex; align-items: center;">
+                <label style="flex-grow: 1;"><strong>Gear (Cyberware, Armor, Weapons, etc.):</strong></label>
+                <div style="display: flex; gap: 10px; width: 20%;">
+                    <button type="button" id="add-dot-gear" title="Add Dot to Gear" style="
+                        background: none; 
+                        border: 1px solid #ddd; 
+                        cursor: pointer; 
+                        text-align: center; 
+                        font-weight: bold; 
+                        flex: 1;">
+                        •
+                    </button>
+                    <button type="button" id="paste-gear" title="Paste Gear" style="
+                        background: none; 
+                        border: 1px solid #ddd; 
+                        cursor: pointer; 
+                        text-align: center; 
+                        flex: 1;">
+                        <i class="fas fa-paste"></i>
+                    </button>
+                </div>
+            </div>
+            <textarea id="gear-input" style="width: 100%; height: 100px;"></textarea>
+            <div style="margin-top: 10px;">
+                <input type="checkbox" id="post-to-chat" checked />
+                <label for="post-to-chat"><strong>Post summary to chat</strong></label>
+            </div>
+        </form>
+        <script>
+            // Event listener for the "Paste Stats" button
+            document.getElementById("paste-stats").addEventListener("click", async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    document.getElementById("statistics-input").value = text;
+                } catch (err) {
+                    ui.notifications.warn("Failed to paste stats from clipboard.");
+                }
+            });
+
+
+            // Event listener for the "Paste Name" button
+            document.getElementById("pasteNameButton").addEventListener("click", async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    document.getElementById("name-input").value = text;
+                } catch (err) {
+                    ui.notifications.warn("Failed to paste name from clipboard.");
+                }
+            });
+  
+            // Event listener for the "Paste Skills" button
+            document.getElementById("paste-skills").addEventListener("click", async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    document.getElementById("skills-input").value = text;
+                } catch (err) {
+                    ui.notifications.warn("Failed to paste skills from clipboard.");
+                }
+            });
+  
+            // Event listener for the "Paste Gear" button
+            document.getElementById("paste-gear").addEventListener("click", async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    document.getElementById("gear-input").value = text;
+                } catch (err) {
+                    ui.notifications.warn("Failed to paste gear from clipboard.");
+                }
+            });
+  
+            // Event listener for the "Add Dot to Skills" button
+            document.getElementById("add-dot-skills").addEventListener("click", () => {
+                const skillsInput = document.getElementById("skills-input");
+                const start = skillsInput.selectionStart;
+                const end = skillsInput.selectionEnd;
+  
+                // Insert "•" at the current cursor position
+                skillsInput.value =
+                    skillsInput.value.substring(0, start) +
+                    "•" +
+                    skillsInput.value.substring(end);
+  
+                // Move the cursor after the inserted "•"
+                skillsInput.selectionStart = skillsInput.selectionEnd = start + 1;
+                skillsInput.focus();
+            });
+  
+            // Event listener for the "Add Dot to Gear" button
+            document.getElementById("add-dot-gear").addEventListener("click", () => {
+                const gearInput = document.getElementById("gear-input");
+                const start = gearInput.selectionStart;
+                const end = gearInput.selectionEnd;
+  
+                // Insert "•" at the current cursor position
+                gearInput.value =
+                    gearInput.value.substring(0, start) +
+                    "•" +
+                    gearInput.value.substring(end);
+  
+                // Move the cursor after the inserted "•"
+                gearInput.selectionStart = gearInput.selectionEnd = start + 1;
+                gearInput.focus();
+            });
+        </script>
+    `,
+    buttons: {
+        apply: {
+            label: "Apply",
+            callback: async (html) => {
+                const name = html.find("#name-input").val();
+                const statisticsData = html.find("#statistics-input").val();
+                const skillsData = html.find("#skills-input").val();
+                const gearData = html.find("#gear-input").val();
+
+                // Update actor's name if provided
+                if (name) {
+                    await actor.update({ name });
+                }
+
+                const hp = parseInt(html.find("#hp-input").val() || 0);
+                const rep = parseInt(html.find("#rep-input").val() || 0);
+                
+                if (!isNaN(hp) && hp > 0) {
+                    await actor.update({
+                        "system.derivedStats.hp.value": hp,
+                        "system.derivedStats.hp.max": hp
+                    });
+                }
+                
+                if (!isNaN(rep) && rep >= 0) {
+                    const reputation = foundry.utils.deepClone(actor.system.reputation || { value: 0 });
+                    reputation.value = rep;
+                    await actor.update({ "system.reputation": reputation });
+                }
+                
+
+
+                // Process stats
+                const stats = statisticsData
+                    ? (() => {
+            const cleanedStats = statisticsData.replace(/\([^)]*\)/g, "").replace(/[^\d\s]/g, '');
+            const statsMatch = cleanedStats.match(/(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/);
+                        if (statsMatch) {
+                            return {
+                                INT: parseInt(statsMatch[1]),
+                                REF: parseInt(statsMatch[2]),
+                                DEX: parseInt(statsMatch[3]),
+                                TECH: parseInt(statsMatch[4]),
+                                COOL: parseInt(statsMatch[5]),
+                                WILL: parseInt(statsMatch[6]),
+                                MOVE: parseInt(statsMatch[7]),
+                                BODY: parseInt(statsMatch[8]),
+                                EMP: parseInt(statsMatch[9])
+                            };
+                        }
+                        return null;
+                    })()
+                    : null;
+  
+                if (stats) {
+                    await actor.update({
+                        "system.stats.int.value": stats.INT,
+                        "system.stats.ref.value": stats.REF,
+                        "system.stats.dex.value": stats.DEX,
+                        "system.stats.tech.value": stats.TECH,
+                        "system.stats.cool.value": stats.COOL,
+                        "system.stats.will.value": stats.WILL,
+                        "system.stats.move.value": stats.MOVE,
+                        "system.stats.body.value": stats.BODY,
+                        "system.stats.emp.value": stats.EMP,
+                        "system.stats.emp.max" : stats.EMP
+                    });
+                }
+
+                const unprocessedSkills = [];
+                const skillsTableRows = [];
+                const unprocessedItems = [];
+                const processedItems = [];
+
+
+                // Process Role
+                const roleName = html.find("#role-input").val()?.trim();
+                if (roleName) {
+                    const roleCompendium = game.packs.find(pack => 
+                        pack.documentName === "Item" && pack.metadata.label.toLowerCase() === "roles"
+                    );
+                
+                    if (roleCompendium) {
+                        const roleItems = await roleCompendium.getDocuments();
+                        const matchedRole = roleItems.find(item => item.name.toLowerCase() === roleName.toLowerCase());
+                
+                        if (matchedRole) {
+                            // Add Role Item to the Actor
+                            await actor.createEmbeddedDocuments("Item", [matchedRole.toObject()]);
+                            ui.notifications.info(`Role "${roleName}" added to the character.`);
+                        } else {
+                            // Open Manual Search Dialog for Role
+                            ui.notifications.warn(`Role "${roleName}" not found in the Roles compendium.`);
+                            const options = roleItems.map(item => ({
+                                name: item.name,
+                                compendium: roleCompendium.metadata.label,
+                                icon: item.img || "icons/svg/item-bag.svg",
+                                item
+                            }));
+                
+                            // Open Search Dialog
+                            handleManualSearchDialog(roleName, options, async (selectedItems) => {
+                                for (const selected of selectedItems) {
+                                    await actor.createEmbeddedDocuments("Item", [selected.item.toObject()]);
+                                }
+                                ui.notifications.info(`Selected Role "${roleName}" added to the character.`);
+                            });
+                        }
+                    } else {
+                        ui.notifications.error("Roles compendium not found.");
+                    }
+                }
+                
+                // Process skills
+                if (skillsData) {
+                    const skillRegex = /([a-zA-Z\s\/\(\)]+?)(\d+)/g; // Matches skills and their values
+                    let match;
+                
+                    while ((match = skillRegex.exec(skillsData)) !== null) {
+                        let skillName = match[1].trim().toLowerCase(); // Capture the full skill name
+                        const totalValue = parseInt(match[2]);   
+  
+                        // Map "Style" to "wardrobe & style"
+                        if (skillName === "style") {
+                          skillName = "wardrobe & style";
+                      }
+                
+                        // Remove any parentheses for general matching
+                        const cleanedSkillName = skillName.replace(/\(.*?\)/g, "").trim();
+                
+                        const statKey = skillStats[cleanedSkillName];
+                        if (!statKey || (stats && stats[statKey] === undefined)) {
+                            // Log and list unmatched skills
+                            console.warn(`Unprocessed Skill: ${skillName}, Total Value: ${totalValue}`);
+                            unprocessedSkills.push(`${skillName} (${totalValue})`);
+                            continue;
+                        }
+                
+                        // Calculate skill values
+                        const statValue = stats ? stats[statKey] : 0;
+                        const baseValue = Math.max(0, totalValue - statValue);
+                
+                        // Check if the skill already exists in the actor
+                        const existingSkill = actor.items.find(
+                            (item) => item.name.toLowerCase() === cleanedSkillName
+                        );
+                
+                        if (existingSkill) {
+                            await existingSkill.update({
+                                "system.base": totalValue,
+                                "system.level": baseValue
+                            });
+                        } else {
+                            await actor.createEmbeddedDocuments("Item", [
+                                {
+                                    name: cleanedSkillName.charAt(0).toUpperCase() + cleanedSkillName.slice(1),
+                                    type: "skill",
+                                    system: { base: totalValue, level: baseValue }
+                                }
+                            ]);
+                        }
+                
+                        // Add to processed skills for summary
+                        skillsTableRows.push(`
+                            <tr>
+                                <td>${cleanedSkillName}</td>
+                                <td>${baseValue}</td>
+                                <td>${totalValue}</td>
+                            </tr>
+                        `);
+                    }
+                }
+  
+                // Process gear
+                if (gearData) {
+                    const compendiums = game.packs.filter(
+                        pack => pack.documentName === "Item" && !pack.metadata.label.toLowerCase().includes("elflines")
+                    );
+                
+                    for (const gear of parseGearItems(gearData)) {
+                        if (["poor", "excellent", "basic"].includes(gear.name.toLowerCase())) {
+                            // Ignore specific items
+                            continue;
+                        }
+                
+                        const matchedItems = [];
+                        for (const compendium of compendiums) {
+                            const items = await compendium.getDocuments();
+                            const matches = items.filter(item =>
+                                item.name.toLowerCase().includes(gear.name.toLowerCase())
+                            );
+                            matchedItems.push(...matches.map(item => ({ item, compendium })));
+                        }
+                
+                        if (matchedItems.length === 1) {
+                            // Single match - add directly
+                            const { item: matchedItem } = matchedItems[0];
+                            const supportsQuantity = matchedItem.system.amount !== undefined;
+                
+                            if (supportsQuantity) {
+                                await actor.createEmbeddedDocuments("Item", [
+                                    {
+                                        ...matchedItem.toObject(),
+                                        system: { ...matchedItem.system, amount: gear.quantity }
+                                    }
+                                ]);
+                            } else {
+                                for (let i = 0; i < gear.quantity; i++) {
+                                    await actor.createEmbeddedDocuments("Item", [
+                                        {
+                                            ...matchedItem.toObject(),
+                                            system: { ...matchedItem.system, amount: 1 }
+                                        }
+                                    ]);
+                                }
+                            }
+                            processedItems.push(`${gear.name} x${gear.quantity}`);
+                        } else if (matchedItems.length > 1) {
+                            // Multiple matches - show selection dialog with multi-selection
+                            await handleMultiSelectionDialog(matchedItems, gear);
+                        } else {
+                            // No match found - show a full compendium search with multi-selection
+                            await handleManualSearchDialog(gear, compendiums);
+                        }
+                    }
+                }
+                
+                // Helper function for multi-selection dialog
+                async function handleMultiSelectionDialog(matchedItems, gear) {
+                  const renderDialog = () => {
+                      const options = matchedItems.map(({ item, compendium }, index) => `
+                          <tr class="item-row" data-name="${item.name.toLowerCase()}">
+                              <td style="width: 50%; text-align: left;">
+                                  <img src="${item.img}" alt="${item.name}" style="width: 24px; height: 24px; margin-right: 10px;" />
+                                  ${item.name}
+                              </td>
+                              <td style="width: 30%; text-align: left;">${compendium.metadata.label}</td>
+                              <td style="width: 20%; text-align: center;">
+                                  <input type="checkbox" data-index="${index}" />
+                              </td>
+                          </tr>
+                      `).join("");
+              
+                      return `
+                          <p>Multiple items found for <strong>${gear.name}</strong>. Please select the desired items:</p>
+                          <input type="text" id="search-field" placeholder="Search items..." style="width: 100%; margin-bottom: 10px;" />
+                          <div style="max-height: calc(20 * 24px); overflow-y: auto; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                              <table style="width: 100%; border-collapse: collapse;">
+                                  <thead>
+                                      <tr>
+                                          <th style="text-align: left;">Item</th>
+                                          <th style="text-align: left;">Compendium</th>
+                                          <th style="text-align: center;">Select</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody id="item-list">
+                                      ${options}
+                                  </tbody>
+                              </table>
+                          </div>
+                          <button id="confirm-selection" style="margin-top: 10px; width: 100%;">Add Selected</button>
+                      `;
+                  };
+              
+                  await new Promise(resolve => {
+                      const dialog = new Dialog({
+                          title: "Select Items",
+                          content: renderDialog(),
+                          buttons: {},
+                          render: (html) => {
+                              // Suchfunktion
+                              html.find("#search-field").on("input", function () {
+                                  const query = this.value.toLowerCase();
+                                  html.find(".item-row").each(function () {
+                                      const rowName = $(this).data("name");
+                                      $(this).toggle(rowName.includes(query));
+                                  });
+                              });
+              
+                              html.find("#confirm-selection").click(async () => {
+                                  const selectedIndexes = html.find("input[type='checkbox']:checked")
+                                      .map((_, checkbox) => parseInt($(checkbox).data("index")))
+                                      .get();
+              
+                                  for (const index of selectedIndexes) {
+                                      const { item: selectedItem } = matchedItems[index];
+                                      await actor.createEmbeddedDocuments("Item", [selectedItem.toObject()]);
+                                  }
+              
+                                  const continueAdding = await new Promise(confirmResolve => {
+                                      new Dialog({
+                                          title: "Continue Adding Items?",
+                                          content: "<p>Do you want to add more items?</p>",
+                                          buttons: {
+                                              yes: {
+                                                  label: "Yes",
+                                                  callback: () => confirmResolve(true)
+                                              },
+                                              no: {
+                                                  label: "No",
+                                                  callback: () => confirmResolve(false)
+                                              }
+                                          }
+                                      }).render(true);
+                                  });
+              
+                                  if (continueAdding) {
+                                      dialog.render(true); // reopen dialog
+                                  } else {
+                                      html.closest(".dialog").remove();
+                                      resolve();
+                                  }
+                              });
+                          }
+                      });
+                      dialog.render(true);
+                  });
+              }
+              
+              
+                
+                // Helper function for manual search dialog
+                async function handleManualSearchDialog(gear, compendiums) {
+                  const allItems = [];
+                  for (const compendium of compendiums) {
+                      const items = await compendium.getDocuments();
+                      allItems.push(...items.map(item => ({ item, compendium })));
+                  }
+              
+                  const renderDialog = () => {
+                      const options = allItems.map(({ item, compendium }, index) => `
+                          <tr class="item-row" data-name="${item.name.toLowerCase()}">
+                              <td style="width: 50%; text-align: left;">
+                                  <img src="${item.img}" alt="${item.name}" style="width: 24px; height: 24px; margin-right: 10px;" />
+                                  ${item.name}
+                              </td>
+                              <td style="width: 30%; text-align: left;">${compendium.metadata.label}</td>
+                              <td style="width: 20%; text-align: center;">
+                                  <input type="checkbox" data-index="${index}" />
+                              </td>
+                          </tr>
+                      `).join("");
+              
+                      return `
+                          <p>No items found for <strong>${gear.name}</strong>. Please select suitable items:</p>
+                          <input type="text" id="search-field" placeholder="Search all items..." style="width: 100%; margin-bottom: 10px;" />
+                          <div style="max-height: calc(20 * 24px); overflow-y: auto; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                              <table style="width: 100%; border-collapse: collapse;">
+                                  <thead>
+                                      <tr>
+                                          <th style="text-align: left;">Item</th>
+                                          <th style="text-align: left;">Compendium</th>
+                                          <th style="text-align: center;">Select</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody id="item-list">
+                                      ${options}
+                                  </tbody>
+                              </table>
+                          </div>
+                          <button id="confirm-selection" style="margin-top: 10px; width: 100%;">Add Selected</button>
+                      `;
+                  };
+              
+                  await new Promise(resolve => {
+                      const dialog = new Dialog({
+                          title: "Select Items",
+                          content: renderDialog(),
+                          buttons: {},
+                          render: (html) => {
+                              // Suchfunktion
+                              html.find("#search-field").on("input", function () {
+                                  const query = this.value.toLowerCase();
+                                  html.find(".item-row").each(function () {
+                                      const rowName = $(this).data("name");
+                                      $(this).toggle(rowName.includes(query));
+                                  });
+                              });
+              
+                              html.find("#confirm-selection").click(async () => {
+                                  const selectedIndexes = html.find("input[type='checkbox']:checked")
+                                      .map((_, checkbox) => parseInt($(checkbox).data("index")))
+                                      .get();
+              
+                                  for (const index of selectedIndexes) {
+                                      const { item: selectedItem } = allItems[index];
+                                      await actor.createEmbeddedDocuments("Item", [selectedItem.toObject()]);
+                                  }
+              
+                                  const continueAdding = await new Promise(confirmResolve => {
+                                      new Dialog({
+                                          title: "Continue Adding Items?",
+                                          content: "<p>Do you want to add more items?</p>",
+                                          buttons: {
+                                              yes: {
+                                                  label: "Yes",
+                                                  callback: () => confirmResolve(true)
+                                              },
+                                              no: {
+                                                  label: "No",
+                                                  callback: () => confirmResolve(false)
+                                              }
+                                          }
+                                      }).render(true);
+                                  });
+              
+                                  if (continueAdding) {
+                                      dialog.render(true); // reopen dialog
+                                      html.closest(".dialog").remove();
+                                      resolve();
+                                  }
+                              });
+                          }
+                      });
+                      dialog.render(true);
+                  });
+              }
+              
+              
+
+
+                // Check if "Post to Chat" is enabled
+const postToChat = html.find("#post-to-chat")[0]?.checked;
+
+if (postToChat) {
+    // Prepare chat message
+    const chatSummary = `
+        <h3>Character Name</h3>
+        <p>${name || "No name provided"}</p>
+        <h3>Statistics</h3>
+        <table>
+            ${Object.entries(stats || {}).map(
+                ([key, value]) => `<tr><td>${key}</td><td>${value}</td></tr>`
+            ).join("")}
+        </table>
+        <h3>Skills</h3>
+        <table>
+            <tr><th>Skill</th><th>LVL</th><th>Base</th></tr>
+            ${skillsTableRows.join("")}
+        </table>
+        <h3>Unprocessed Skills</h3>
+        <div style="${unprocessedSkills.length > 0 ? 'color: red; font-weight: bold;' : ''}">
+            ${unprocessedSkills.length > 0 ? unprocessedSkills.join(", ") : "None"}
+        </div>
+    `;
+
+    // Post summary to chat
+    ChatMessage.create({
+        content: chatSummary,
+        whisper: ChatMessage.getWhisperRecipients("GM")
+    });
+}
+
+                      
+              
+            }
+        },
+        cancel: {
+            label: "Cancel"
+        }
+    },
+    render: (html) => {
+        html.find("#mook-calculator-button").on("click", () => {
+          // Call the Mook-Calculator macro code
+          const dialog = new Dialog({
+            title: "Enter Data",
+            content: `
+              <style>
+                .form-container {
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: center;
+                  align-items: center;
+                }
+    
+                .labels-container {
+                  display: flex;
+                  justify-content: space-between;
+                  width: 100%;
+                  margin-bottom: 10px;
+                }
+    
+                .labels-container div {
+                  width: 30%;
+                  text-align: center;
+                }
+    
+                .inputs-container {
+                  display: flex;
+                  justify-content: space-between;
+                  width: 100%;
+                }
+    
+                .inputs-container div {
+                  width: 30%;
+                }
+    
+                .form-group input {
+                  width: 100%;
+                  box-sizing: border-box;
+                }
+    
+                .copy-button {
+                  flex: 0 0 20%;
+                  min-width: 50px;
+                  padding: 5px;
+                  background: transparent;
+                  border: none;
+                  cursor: pointer;
+                  text-align: center;
+                }
+    
+                .copy-button i {
+                  font-size: 20px;
+                }
+              </style>
+              <form style="width: 100%; margin: 0;">
+              <div class="form-container" style="width: 100%;">
+          
+                  <!-- Single Input Field -->
+                  <div class="inputs-container" style="width: 100%; display: flex; align-items: center;">
+                      <div class="form-group" style="width: 90%;">
+                          <input type="text" name="combinedValues" id="combinedValues" 
+                                 placeholder="Combat# INIT MOVE" 
+                                 value="" 
+                                 tabindex="1" 
+                                 style="width: 100%; box-sizing: border-box; padding: 5px;" />
+                      </div>
+                      <button type="button" id="pasteButton" 
+                              style="margin-left: 10px; width: 10%; background: none; border: 1px solid #ddd; cursor: pointer; text-align: center;">
+                          <i class="fas fa-paste"></i>
+                      </button>
+                  </div>
+              </div>
+          </form>
+
+          `,
+          render: (html) => {
+              // Event für den Paste-Button
+              html.find("#pasteButton").on("click", async () => {
+                  try {
+                      const text = await navigator.clipboard.readText();
+                      html.find("#combinedValues").val(text); // Setze den Text in das Textfeld ein
+                  } catch (err) {
+                      ui.notifications.warn("Failed to paste content from clipboard.");
+                      console.error("Clipboard read error:", err);
+                  }
+              });
+          },
+          buttons: {
+              apply: {
+                label: "Apply",
+                tabindex: 4,
+                callback: (html) => {
+                  // Macro functionality here
+                  const combinedValues = html.find('#combinedValues').val().trim();
+                  const values = combinedValues.split(" ");
+                  
+                  if (values.length !== 3) {
+                      ui.notifications.warn("Please enter values in the format: Combat# INIT MOVE (e.g., 12 6 4).");
+                      return;
+                  }
+                  
+                  const combatNumber = parseInt(values[0]);
+                  const init = parseInt(values[1]);
+                  const move = parseInt(values[2]);
+                  
+                  if (isNaN(combatNumber) || isNaN(init) || isNaN(move)) {
+                      ui.notifications.error("Invalid values. Make sure to enter three numbers.");
+                      return;
+                  }
+                  
+                  let stats = `0 ${init} 0 0 0 0 ${move} 0 0`;
+                  let skills = `brawling ${combatNumber}, evasion ${combatNumber}, martial arts ${combatNumber}, melee weapon ${combatNumber}, archery ${combatNumber}, autofire ${combatNumber}, handgun ${combatNumber}, heavy weapons ${combatNumber}, shoulder arms ${combatNumber}`;
+                                    
+                  new Dialog({
+                    title: "Generated Data",
+                    content: `
+                      <form>
+                        <div class="data-field">
+                          <label for="stats">STATS:</label>
+                          <input type="text" id="stats" value="${stats}" readonly />
+                          <button type="button" class="copy-button" title="Copy to Clipboard" onclick="navigator.clipboard.writeText(document.getElementById('stats').value)">
+                            <i class="fas fa-copy"></i>
+                          </button>
+                        </div>
+                        <div class="data-field">
+                          <label for="skills">Skills:</label>
+                          <input type="text" id="skills" value="${skills}" readonly />
+                          <button type="button" class="copy-button" title="Copy to Clipboard" onclick="navigator.clipboard.writeText(document.getElementById('skills').value)">
+                            <i class="fas fa-copy"></i>
+                          </button>
+                        </div>
+                      </form>
+                    `,
+                    buttons: {
+                        close: {
+                            label: "Close"
+                        }
+                    }
+                }).render(true);
+            }
+        },
+        cancel: {
+            label: "Cancel"
+
+        }
+    }
+}).render(true);
+});
+}
+}).render(true);

@@ -1,0 +1,449 @@
+/*--- Text Drop Stuff ---*/
+.cbprtitleline {
+	display: block; 
+	height: 20px; 
+	background: #ee2f27;
+	background-image: linear-gradient(to left, black 20px, #ee2f27 20px);
+	width: 99%;
+    position: relative;
+    top: -12px;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+/*--- .cbprtitleline:after {
+	content: "";
+	display: block; 
+	height: 23px; 
+	width: 23px; 
+	background: black; 
+	left: 0%; 
+	float: right; 
+	position: relative; 
+	top: -33px;
+	z-index: 2;
+} ---*/
+
+.cbrpdrop:first-letter{
+	initial-letter: 1.8 !important;
+}
+
+.cbrpdrop{
+	z-index: 5;
+	font-size: 20px !important;
+	position: relative;
+	font-family: Industry Inc Base !important;
+	text-transform: uppercase;
+	text-decoration: none;
+	border-bottom: none;
+}
+
+.cbprtitleline > p {
+	font-family: Dotsies;
+	color: white;
+	line-height: 100%;
+	text-align: justify;
+	text-align-last: justify;
+	padding-right: 10px;
+	padding-left: 40px;
+}
+
+.cbrpsection {
+	border-bottom: 4px solid #ee2f27;
+	font-family: Industry Inc Base !important;
+	font-variant-caps: small-caps;
+	font-size: 24px !important;
+}
+
+/*--- Text Drop Stuff End ---*/
+
+.cprcoretitle {
+	font-variant-caps: small-caps;
+	font-family: Industry Inc Base !important;
+	font-size: 25px !important;
+	border-bottom: 5px solid #ee2f27;
+}
+
+.cprcoretitlewsquare {
+	font-variant-caps: small-caps;
+	font-family: Industry Inc Base !important;
+	font-size: 25px !important;
+	border-bottom: 5px solid #ee2f27;
+	margin-bottom: 12px;
+}
+
+.cprcoretitlewsquare:after {
+	display: block; 
+	content: "";
+	height: 17px; 
+	width: 17px; 
+	background: #ee2f27; 
+	left: 0%; 
+	float: right; 
+	position: relative;
+	top: 27px; /*---Needs to be altered to requirements---*/
+}
+
+.midwarrows {
+	font-family: FuturaPTHeavy;
+	text-align: center;
+	border-bottom: none;
+	font-size: 18px;
+}
+.midwarrows::Before {
+	content: "▶ ";
+	color: #ee2f27;
+}
+
+.midwarrows::After {
+	content: " ◀";
+	color: #ee2f27;
+}
+
+.midwarrow::Before {
+	content: "▶ ";
+	color: #ee2f27;
+	font-size: 20px;
+}
+
+.midwarrow {
+	font-family: Industry Inc Base;
+	font-variant-caps: small-caps;
+	font-size: 18px;
+	border-bottom: none;
+}
+
+.dgdpreparedby {
+	text-align: center;
+	font-family: FuturaPTCondBook;
+	font-style: italic;
+}
+
+.dgdtitle {
+	font-size: 2.2vw;
+	text-align: center;
+	font-family: Amboy Black;
+}
+
+.dgdheader {
+	font-variant-caps: small-caps;
+	font-family: Industry Inc Base;
+	font-size: 35px;
+	border-bottom: 5px solid #ee2f27;
+}
+
+.seepage {
+	color: #ee2f27;
+	text-transform: uppercase;
+	font-family: Industry Test Black;
+	font-style: normal;
+}
+
+.cyberpunkbar {
+	display: block; 
+	height: 5px; 
+	background: #ee2f27; 
+	width: 99%;
+	position: relative;
+	top: -8px;
+}
+
+.cyberpunksquare {
+	display: block; 
+	height: 17px; 
+	width: 17px; 
+	background: #ee2f27; 
+	left: 0%; 
+	float: right; 
+	position: relative;
+	top: -19px;
+}
+
+.cyberpunkbarwsquare {
+	display: block; 
+	height: 5px; 
+	background: #ee2f27; 
+	width: 99%;
+	position: relative;
+	top: -8px;
+}
+
+
+.cyberpunkbarwsquare:after {
+	content: "";
+	display: block; 
+	height: 17px; 
+	width: 17px; 
+	background: #ee2f27; 
+	left: 0%; 
+	float: right; 
+	position: relative;
+	top: -30px;
+}
+
+/*--- Agent Journal ---*/
+
+.journal-header {
+	font-family: FuturaPTHeavy;
+}
+
+.journal-entry-content {
+  background: url(Agent%20Mini%20Frame%20HD.png) !important;
+  background-size: cover !important;
+  position: relative;
+}
+
+.journal-entry-page.image figure img {
+  border: 1px solid #999999 !important;
+  border-radius: 4px !important;
+}
+
+.journal-entry-page.image img {
+  border: 1px solid #999999 !important;
+  border-radius: 4px !important;
+}
+
+.journal-entry-content > .journal-header {
+  width: 250px;
+  position: absolute;
+  left: 50%;
+  margin-top: 1px !important;
+  margin-left: -125px !important;
+  z-index: 1;
+}
+
+.journal-entry-content > .journal-header > input {
+  color: #ddd;
+  border: 0px;
+  background: transparent !important;
+  font-size: 24px !important;
+}
+
+.journal-entry-pages > .scrollable {
+  background: #ececec;
+  margin-right: 20px;
+  margin-left: 10px;
+  margin-top: 70px;
+  margin-bottom: 90px;
+  border-radius: 10px;
+  padding: 25px 25px !important;
+}
+
+/*--- Agent Journal End ---*/
+
+/*--- Dots for Skills Table ---*/
+.dot-table td {
+    max-width:200px;
+    overflow:hidden;
+    white-space:nowrap;
+}
+.dot-table td:first-child:after {
+    content:"..................................................................................................................................................................................................................................................................................................."
+}
+
+/*--- Dots for Skills Table End---*/
+
+
+/*--- Cyberpunk Tables ---*/
+.CBPRTbl{
+	border: 5px solid #cf2b24;
+	font-size: small;
+}
+
+.CBPRTbl td{
+	border-right: 5px solid #cf2b24;
+}
+
+.CBPRTbl tr:first-child {
+	color: white;
+	font-weight: bold;
+	background-color: #cf2b24 !important;
+}
+
+.CBPRTbl  tr:nth-child(even) {
+	background-color: white;
+}
+
+.CBPRTbl  tr:nth-child(odd) {
+	background-color: #fcd4c2;
+}
+
+/*--- Cyberpunk Tables End ---*/
+
+/*--- Cyberpunk Weapon Tables ---*/
+.CBPRWeaponTbl {
+	border: 5px solid #cf2b24;
+	font-size: x-small;
+	border-collapse: collapse;
+}
+
+.CBPRWeaponTbl tr:first-child {
+	color: white;
+	font-weight: bold;
+	background-color: #cf2b24 !important;
+	text-align: center;
+}
+
+.CBPRWeaponTbl  tr:nth-child(even) {
+	background-color: white;
+	text-align: center;
+}
+
+.CBPRWeaponTbl  tr:nth-child(even) td:not(:first-child) {
+	background-color: white;
+	border-left: solid 5px #cf2b24;
+}
+
+.CBPRWeaponTbl  tr:nth-child(odd) {
+	background-color: black;
+	color: white !important;
+}
+
+.CBPRWeaponTbl  tr:nth-child(odd):not(:first-child) td:first-child:Before {
+	content: "└---▶";
+	color: #ee2f27;
+	font-weight: bold;
+	margin-left: 5%;
+	margin-right: 1%;
+	font-family: Industry Inc Base;
+	letter-spacing: -0.7px;
+	text-align: right;
+}
+
+/*--- Cyberpunk Weapon Tables End ---*/
+
+
+
+/*--- Scream Sheet ---*/
+.ss-byline {
+	background: #d2d3d5;
+	text-align: center;
+	font-style: italic;
+	font-size: x-small;
+}
+
+.ss-link {
+	color: #3a4ea2;
+	font-size: 10px;
+}
+
+.ss-article {
+	text-align: justify;
+	hyphens: auto;
+}
+
+.ss-header {
+	background: #EBEBEA;
+	top: -30px;
+	position: sticky;
+	position: -webkit-sticky;
+	border-image: linear-gradient(#464646, rgba(255,255,255,0)) 150;
+	border-top: 5px solid;
+	border-bottom: 5px solid;
+	margin-bottom: 14px;
+}
+
+.ss-articleheader {
+	font-family: FuturaPTCondBold;
+	font-weight: bold;
+	font-size: 18px;
+	text-align: center;
+	
+}
+
+.ss-activetab {
+	clip-path: polygon(11% 0, 100% 0, 100% 100%, 0 100%, 0 31%);
+	width: 100px;
+	height: 35px;
+	background: #ee2f27;
+}
+
+.ss-inactivetab {
+	clip-path: polygon(11% 0, 100% 0, 100% 100%, 0 100%, 0 31%);
+	width: 100px;
+	height: 35px;
+	background: Black;
+}
+
+.ss-headerflex {
+	display: flex;
+	flex-wrap: wrap;
+	width: 412px;
+	gap: 4px 4px;
+}
+
+.ss-headerflex > div {
+	width: 100px;
+	height: 35px;
+	text-align: center;
+	line-height: 17px;
+	background-size: contain;
+	background-repeat: no-repeat;
+	font-family: Industry Inc Base;
+	text-transform: uppercase;
+	font-size: 110%;
+	text-align: center;
+	Color: white;
+}
+
+.ss-columns {
+	column-count: 2;
+}
+
+.ss-columns > div {
+	border-bottom: dotted 1px black;
+}
+
+
+.ss-columns > div > img, .informational-flex > div > img {
+	margin-left: auto;
+	border: none;
+	display: block;
+	margin-right: auto;
+}
+
+.ss-columns > div > div {
+	text-align: justify;
+	hyphens: auto;
+}
+
+/*--- Scream Sheet End ---*/
+
+.greyinfobox {
+	border-radius: 8% 0% 8% 0%;
+	border: 3px solid #ee2f27;
+	background: #f3f3f4;
+	text-align: center;
+}
+
+.informational-flex {
+	column-count: 2;
+}
+.flex-column {
+	display: flex;
+	flex-wrap: nowrap;
+}
+
+.flex-column > div {
+	width: 45%;
+}
+
+.flex-column > div:nth-child(2n) {
+	margin-left: auto;
+	margin-right: 0;
+}
+
+.role-select-2 {
+	display: flex;
+	flex-wrap: nowrap;
+	column-gap: 30%;
+}
+
+.role-select-2 > div:nth-child(2) {
+	margin-left: auto;
+	margin-right: 14%;
+}
+.role-select-2 > div:nth-child(1) {
+	margin-left: 14%;
+	margin-right: auto;
+}
