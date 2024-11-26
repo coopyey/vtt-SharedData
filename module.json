@@ -141,7 +141,8 @@
             "ownership": {
                 "PLAYER": "OBSERVER",
                 "ASSISTANT": "OWNER"
-            },,
+            },
+            "syste": "cyberpunk-red-core",
             "flags": {}
         }
     ]
