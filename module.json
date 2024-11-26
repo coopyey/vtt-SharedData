@@ -55,7 +55,8 @@
             },
             "system": "cyberpunk-red-core",
             "flags": {}
-        },        {
+        },        
+        {
             "name": "netrunning-black-ice-programs",
             "label": "Programs: Black Ice",
             "path": "packs/netrunning-black-ice-programs",
