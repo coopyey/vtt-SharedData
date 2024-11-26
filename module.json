@@ -9,15 +9,6 @@
     },
     "packFolders": [
         {
-            "name": "Night City Weather",
-            "sorting": "m",
-            "packs": [
-                "night-city-weather-tables",
-                "night-city-weather-macros",
-                "night-city-weather-journal"
-            ]
-        },
-        {
             "name": "Netrunning Items",
             "sorting": "m",
             "packs": [
@@ -85,51 +76,6 @@
                 "PLAYER": "OBSERVER",
                 "ASSISTANT": "OWNER"
             },
-            "system": "cyberpunk-red-core",
-            "flags": {}
-        },
-        {
-            "name": "night-city-weather-tables",
-            "label": "Night City Weather Tables",
-            "path": "packs/night-city-weather-tables",
-            "type": "RollTable",
-            "system": "cyberpunk-red-core",
-            "ownership": {
-                "PLAYER": "OBSERVER",
-                "ASSISTANT": "OWNER"
-            },
-            "relationships": {
-                "requires": [
-                    {
-                        "id": "foundryvtt-simple-calendar",
-                        "type": "module",
-                        "compatibility": {} 
-                    }
-                ]
-            },
-            "flags": {}
-        },
-        {
-            "name": "night-city-weather-macros",
-            "label": "Night City Weather Macros",
-            "path": "packs/night-city-weather-macros",
-            "type": "Macro",
-            "system": "cyberpunk-red-core",
-            "ownership": {
-                "PLAYER": "OBSERVER",
-                "ASSISTANT": "OWNER"
-            },
-            "flags": {}
-        },
-        {
-            "name": "night-city-weather-journal",
-            "label": "Night City Weather Journal",
-            "path": "packs/night-city-weather-journal",
-            "type": "JournalEntry",
-            "ownership": {
-                "PLAYER": "OBSERVER",
-                "ASSISTANT": "OWNER"
-                },
             "system": "cyberpunk-red-core",
             "flags": {}
         },
