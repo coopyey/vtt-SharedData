@@ -1,0 +1,69 @@
+{
+    "name": "datapool-lifestyles",
+    "title": "Datapool: Lifestyles",
+    "author": "aru.guy",
+    "description": "A compendium of lifestyle items for CyberpunkRED.",
+    "relationships": {
+        "systems": [
+            {
+                "id": "cyberpunk-red-core",
+                "type": "system",
+                "compatibility": {
+                    "minimum": "0.88.2"
+                }
+            }
+        ]
+    },
+	"packFolders": [
+		{
+			"name": "Datapool Compendiums",
+			"sorting": "m",
+			"packs": [
+				"lifestyle-items",
+				"lifestyle-macros"
+			]
+		}
+	],
+    "packs": [
+        {
+            "name": "lifestyle-items",
+            "label": "Lifestyle Items",
+			"banner": "modules/datapool-lifestyles/packs/lifestyle-banner.webp",
+            "type": "Item",
+            "system": "cyberpunk-red-core",
+            "path": "packs/lifestyle-items.db",
+            "entity": "Item",
+            "module": "datapool-lifestyles"
+        },
+		{
+			"name": "lifestyle-macros",
+            "label": "Lifestyle Macros",
+			"banner": "modules/datapool-lifestyles/packs/lifestyle-banner.webp",
+            "type": "Macro",
+            "system": "cyberpunk-red-core",
+            "path": "packs/lifestyle-macros.db",
+            "entity": "Macro",
+            "module": "datapool-lifestyles"
+		}
+    ],
+    "id": "datapool-lifestyles",
+	"authors": [
+        {
+            "name": "aru.guy"
+        },
+        {
+            "name": "Henzard"
+        },		
+		{
+			"name": "R. Talsorian Games",
+			"url": "https://rtalsoriangames.com/"
+		}
+    ],
+    "minimumCoreVersion": "0.11.0",
+    "compatibleCoreVersion": "11",
+    "compatibility": {
+        "minimum": 11,
+        "verified": 11
+    },
+    "version": "2.1"
+}

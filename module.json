@@ -106,6 +106,18 @@
             },
             "syste": "cyberpunk-red-core",
             "flags": {}
+        },
+        {
+            "name": "datapool-lifestyles",
+            "label": "Datapool: Lifestyles",
+            "path": "packs/datapool-lifestyles",
+            "type": "Item",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "system": "cyberpunk-red-core",
+            "flags": {}
         }
     ]
 }
