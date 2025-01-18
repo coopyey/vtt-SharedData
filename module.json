@@ -111,7 +111,7 @@
             "name": "datapool-lifestyles",
             "label": "Datapool: Lifestyles",
             "path": "packs/datapool-lifestyles",
-            "type": "Item",
+            "type": "Macro",
             "ownership": {
                 "PLAYER": "OBSERVER",
                 "ASSISTANT": "OWNER"
