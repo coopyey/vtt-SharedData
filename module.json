@@ -3,10 +3,10 @@
     "title": "Coop's Shared Data",
     "description": "Sharing data across worlds. Primarily for Cyberpunk RED.",
     "author": "coopyey",
-    "version": "1.1.3",
+    "version": "1.1.4",
     "url": "https://github.com/coopyey/vtt-SharedData",
-    "manifest": "https://github.com/coopyey/vtt-SharedData/releases/download/v1.1.3/module.json",
-    "download": "https://github.com/coopyey/vtt-SharedData/releases/download/v1.1.3/module.zip",
+    "manifest": "https://github.com/coopyey/vtt-SharedData/releases/download/v1.1.4/module.json",
+    "download": "https://github.com/coopyey/vtt-SharedData/releases/download/v1.1.4/module.zip",
     "compatibilityCoreVersion": "11",
     "compatibility": {
         "minimum": "11.315"
@@ -29,6 +29,14 @@
                 "lifestyle-items",
                 "lifestyle-macros"
             ]
+        },
+        {
+            "name": "Core Items",
+            "sorting": "m",
+            "packs": [
+                "cpr-pregens",
+                "hustle-tables"
+            ]
         }
     ],
     "packs": [
@@ -47,7 +55,7 @@
         {
             "name": "hustle-tables",
             "label": "Hustles",
-            "path": "packs/hustle-tables",
+            "path": "packs/hustle-table",
             "type": "RollTable",
             "ownership": {
                 "PLAYER": "OBSERVER",
@@ -151,9 +159,9 @@
             "module": "datapool-lifestyles"
         },
         {
-			"name": "lifestyle-macros",
+            "name": "lifestyle-macros",
             "label": "Lifestyle Macros",
-			"banner": "modules/datapool-lifestyles/packs/lifestyle-banner.webp",
+            "banner": "modules/datapool-lifestyles/packs/lifestyle-banner.webp",
             "type": "Macro",
             "system": "cyberpunk-red-core",
             "path": "packs/lifestyle-macros.db",
