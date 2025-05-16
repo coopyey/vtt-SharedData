@@ -159,6 +159,6 @@
             "path": "packs/lifestyle-macros.db",
             "entity": "Macro",
             "module": "datapool-lifestyles"
-		},
+		}
     ]
 }
