@@ -150,7 +150,7 @@
             "entity": "Item",
             "module": "datapool-lifestyles"
         },
-		{
+        {
 			"name": "lifestyle-macros",
             "label": "Lifestyle Macros",
 			"banner": "modules/datapool-lifestyles/packs/lifestyle-banner.webp",
@@ -159,6 +159,6 @@
             "path": "packs/lifestyle-macros.db",
             "entity": "Macro",
             "module": "datapool-lifestyles"
-		}
+        }
     ]
 }
